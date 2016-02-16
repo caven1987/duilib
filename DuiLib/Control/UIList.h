@@ -24,17 +24,17 @@ typedef struct tagTListInfoUI
     RECT rcTextPadding;
     DWORD dwTextColor;
     DWORD dwBkColor;
-    CDuiString sBkImage;
+    TDrawInfo diBk;
     bool bAlternateBk;
     DWORD dwSelectedTextColor;
     DWORD dwSelectedBkColor;
-    CDuiString sSelectedImage;
+    TDrawInfo diSelected;
     DWORD dwHotTextColor;
     DWORD dwHotBkColor;
-    CDuiString sHotImage;
+    TDrawInfo diHot;
     DWORD dwDisabledTextColor;
     DWORD dwDisabledBkColor;
-    CDuiString sDisabledImage;
+    TDrawInfo diDisabled;
     DWORD dwLineColor;
     bool bShowHtml;
     bool bMultiExpandable;
@@ -55,7 +55,7 @@ class IListOwnerUI
 public:
     virtual TListInfoUI* GetListInfo() = 0;
     virtual int GetCurSel() const = 0;
-    virtual bool SelectItem(int iIndex, bool bTakeFocus = false) = 0;
+    virtual bool SelectItem(int iIndex, bool bTakeFocus = false, bool bTriggerEvent=true) = 0;
     virtual void DoEvent(TEventUI& event) = 0;
 };
 
@@ -78,7 +78,7 @@ public:
     virtual IListOwnerUI* GetOwner() = 0;
     virtual void SetOwner(CControlUI* pOwner) = 0;
     virtual bool IsSelected() const = 0;
-    virtual bool Select(bool bSelect = true) = 0;
+    virtual bool Select(bool bSelect = true, bool bTriggerEvent=true) = 0;
     virtual bool IsExpanded() const = 0;
     virtual bool Expand(bool bExpand = true) = 0;
     virtual void DrawItemText(HDC hDC, const RECT& rcItem) = 0;
@@ -103,7 +103,7 @@ public:
     bool GetScrollSelect();
     void SetScrollSelect(bool bScrollSelect);
     int GetCurSel() const;
-    bool SelectItem(int iIndex, bool bTakeFocus = false);
+    bool SelectItem(int iIndex, bool bTakeFocus = false, bool bTriggerEvent=true);
 
     CListHeaderUI* GetHeader() const;  
     CContainerUI* GetList() const;
@@ -131,6 +131,7 @@ public:
     void SetItemTextColor(DWORD dwTextColor);
     void SetItemBkColor(DWORD dwBkColor);
     void SetItemBkImage(LPCTSTR pStrImage);
+	bool IsAlternateBk() const;
     void SetAlternateBk(bool bAlternateBk);
     void SetSelectedItemTextColor(DWORD dwTextColor);
     void SetSelectedItemBkColor(DWORD dwBkColor);
@@ -148,7 +149,6 @@ public:
 	DWORD GetItemTextColor() const;
 	DWORD GetItemBkColor() const;
 	LPCTSTR GetItemBkImage() const;
-    bool IsAlternateBk() const;
 	DWORD GetSelectedItemTextColor() const;
 	DWORD GetSelectedItemBkColor() const;
 	LPCTSTR GetSelectedItemImage() const;
@@ -164,7 +164,8 @@ public:
     int GetExpandedItem() const;
     bool ExpandItem(int iIndex, bool bExpand = true);
 
-    void SetPos(RECT rc);
+	void SetPos(RECT rc, bool bNeedInvalidate = true);
+	void Move(SIZE szOffset, bool bNeedInvalidate = true);
     void DoEvent(TEventUI& event);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
@@ -210,9 +211,9 @@ public:
     CListBodyUI(CListUI* pOwner);
 
     void SetScrollPos(SIZE szPos);
-    void SetPos(RECT rc);
+	void SetPos(RECT rc, bool bNeedInvalidate = true);
     void DoEvent(TEventUI& event);
-    BOOL SortItems(PULVCompareFunc pfnCompare, UINT_PTR dwData);
+    BOOL SortItems(PULVCompareFunc pfnCompare, UINT_PTR dwData, int& iCurSel);
 protected:
 	static int __cdecl ItemComareFunc(void *pvlocale, const void *item1, const void *item2);
 	int __cdecl ItemComareFunc(const void *item1, const void *item2);
@@ -293,12 +294,11 @@ protected:
     UINT m_uTextStyle;
     bool m_bShowHtml;
 	RECT m_rcTextPadding;
-    CDuiString m_sNormalImage;
-    CDuiString m_sHotImage;
-    CDuiString m_sPushedImage;
-    CDuiString m_sFocusedImage;
-    CDuiString m_sSepImage;
-    CDuiString m_sSepImageModify;
+    TDrawInfo m_diNormal;
+    TDrawInfo m_diHot;
+    TDrawInfo m_diPushed;
+    TDrawInfo m_diFocused;
+    TDrawInfo m_diSep;
 };
 
 
@@ -324,7 +324,7 @@ public:
     void SetVisible(bool bVisible = true);
 
     bool IsSelected() const;
-    bool Select(bool bSelect = true);
+    bool Select(bool bSelect = true, bool bTriggerEvent=true);
     bool IsExpanded() const;
     bool Expand(bool bExpand = true);
 
@@ -418,7 +418,7 @@ public:
     void SetEnabled(bool bEnable = true);
 
     bool IsSelected() const;
-    bool Select(bool bSelect = true);
+    bool Select(bool bSelect = true, bool bTriggerEvent=true);
     bool IsExpanded() const;
     bool Expand(bool bExpand = true);
 

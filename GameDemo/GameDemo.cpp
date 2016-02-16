@@ -178,7 +178,7 @@ public:
             IWebBrowser2* pWebBrowser = NULL;
             pActiveXUI->GetControl(IID_IWebBrowser2, (void**)&pWebBrowser);
             if( pWebBrowser != NULL ) {
-                pWebBrowser->Navigate(L"https://code.google.com/p/duilib/",NULL,NULL,NULL,NULL);  
+                pWebBrowser->Navigate(L"https://github.com/duilib/duilib",NULL,NULL,NULL,NULL);  
                 //pWebBrowser->Navigate(L"about:blank",NULL,NULL,NULL,NULL); 
                 pWebBrowser->Release();
             }
@@ -230,6 +230,7 @@ public:
         CLoginFrameWnd* pLoginFrame = new CLoginFrameWnd();
         if( pLoginFrame == NULL ) { Close(); return; }
         pLoginFrame->Create(m_hWnd, _T(""), UI_WNDSTYLE_DIALOG, 0, 0, 0, 0, 0, NULL);
+		pLoginFrame->SetIcon(IDI_ICON_DUILIB);
         pLoginFrame->CenterWindow();
         pLoginFrame->ShowModal();
     }
@@ -609,15 +610,20 @@ private:
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int nCmdShow)
 {
     CPaintManagerUI::SetInstance(hInstance);
+#if 0
     CPaintManagerUI::SetResourcePath(CPaintManagerUI::GetInstancePath() + _T("skin"));
     CPaintManagerUI::SetResourceZip(_T("GameRes.zip"));
+#else
+	CPaintManagerUI::SetResourcePath(CPaintManagerUI::GetInstancePath() + _T("skin/GameRes"));
+#endif
 
     HRESULT Hr = ::CoInitialize(NULL);
     if( FAILED(Hr) ) return 0;
 
     CGameFrameWnd* pFrame = new CGameFrameWnd();
     if( pFrame == NULL ) return 0;
-    pFrame->Create(NULL, _T(""), UI_WNDSTYLE_FRAME, 0L, 0, 0, 1024, 738);
+	pFrame->SetIcon(IDI_ICON_DUILIB);
+    pFrame->Create(NULL, _T("ÓÎÏ·ÖÐÐÄ"), UI_WNDSTYLE_FRAME, 0L, 0, 0, 1024, 738);
     pFrame->CenterWindow();
     ::ShowWindow(*pFrame, SW_SHOWMAXIMIZED);
 

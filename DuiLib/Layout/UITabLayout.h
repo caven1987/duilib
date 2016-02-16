@@ -18,10 +18,10 @@ namespace DuiLib
 		bool Remove(CControlUI* pControl);
 		void RemoveAll();
 		int GetCurSel() const;
-		bool SelectItem(int iIndex);
-		bool SelectItem(CControlUI* pControl);
+		bool SelectItem(int iIndex, bool bTriggerEvent=true);
+		bool SelectItem(CControlUI* pControl,  bool bTriggerEvent=true);
 
-		void SetPos(RECT rc);
+		void SetPos(RECT rc, bool bNeedInvalidate = true);
 
 		void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
